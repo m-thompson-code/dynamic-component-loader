@@ -24,9 +24,9 @@ There are 3 custom cell components. Each implement the base class `BaseCellCompo
 
 All 3 custom cell components showcase input binding.
 
-The custom cells allow for one input binding `@Input() data?: any`.
+The custom cells allow for one input binding `@Input() data?: unknown`.
 
-The directive will assume type `any`, but you can type the custom cell components' data property.
+The directive will assume type `unknown`, but you can type the custom cell components' data property.
 
 #### Change Detection OnPush
 

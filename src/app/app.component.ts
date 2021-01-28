@@ -1,12 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { BaseCellComponent } from './cell.directive';
+import { BaseCellComponent, CellEvent } from './cell.directive';
 import { CurrencyCellComponent } from './components/currency-cell/currency-cell.component';
 import { InputCellComponent } from './components/input-cell/input-cell.component';
 import { PercentCellComponent } from './components/percent-cell/percent-cell.component';
 
 export interface Cell {
     component: typeof BaseCellComponent;
-    data: any;
+    data: unknown;
+}
+
+interface Row {
+    cells: [];
 }
 
 @Component({
@@ -15,9 +19,11 @@ export interface Cell {
     templateUrl: './app.component.html',
 })
 export class AppComponent implements OnInit {
-    text?: string;
+    event?: CellEvent<'input' | 'saved', string>;
 
     cells: Cell[] = [];
+
+    cols: Cell[];
 
     constructor() {}
 
@@ -108,8 +114,8 @@ export class AppComponent implements OnInit {
         }
     }
 
-    handleCellDataEmitted(event) {
+    handleValueEmitted(event: CellEvent<'input' | 'saved', string>) {
         console.log(event);
-        this.text = event.data;
+        this.event = event;
     }
 }

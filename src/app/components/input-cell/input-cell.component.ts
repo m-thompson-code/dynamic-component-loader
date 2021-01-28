@@ -9,5 +9,15 @@ import { BaseCellComponent, CellEvent } from 'src/app/cell.directive';
 })
 export class InputCellComponent implements BaseCellComponent {
     @Input() data: string;
-    @Output() dataEmitted?: EventEmitter<CellEvent> = new EventEmitter();
+    @Output() valueEmitted: EventEmitter<CellEvent<'input' | 'saved', string>> = new EventEmitter();
+
+    show?: boolean;
+
+    save(value: string) {
+        this.data = value;
+
+        this.valueEmitted.emit({type: 'saved', value: this.data });
+
+        this.show = false;
+    }
 }

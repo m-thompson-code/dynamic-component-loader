@@ -1,3 +1,9 @@
 <p>
-    <input #input [value]="data" (input)="dataEmitted.emit({type: 'input', data: input.value })">
+    <ng-container *ngIf="!show">
+        <button (click)="show = true">Edit</button><span>{{ data }}</span>
+    </ng-container>
+
+    <ng-container *ngIf="show">
+        <button (click)="save(input.value)">Save</button><input #input [value]="data" (input)="valueEmitted.emit({type: 'input', value: input.value })">
+    </ng-container>
 </p>

@@ -1,3 +1,4 @@
+<!-- Add / Remove cells -->
 <div>
     <button (click)="addCell('percent')">Percent</button>
     <button (click)="addCell('currency')">Currency</button> 
@@ -5,16 +6,19 @@
     <button (click)="popCell()">Pop</button>
 </div>
 
+<!-- Change array order, data bindings, component classes -->
 <div>
     <button (click)="randomizeDatas()">Randomize data</button>
     <button (click)="randomizeComponents()">Randomize components</button>
     <button (click)="shuffleCells()">Shuffle</button>
 </div>
 
-<div>
-    {{ text ? ('Captured output text: ' + text) : '' }}
+<!-- Showcasing output binding from input cell component -->
+<div *ngIf="event">
+    {{ event.type }} : {{ event.value }}
 </div>
 
+<!-- Rendering dynamic custom cells -->
 <div>
-    <ng-template *ngFor="let cell of cells" appCell [component]="cell.component" [data]="cell.data" (dataEmitted)="handleCellDataEmitted($event)"></ng-template>
+    <ng-template *ngFor="let cell of cells" appCell [component]="cell.component" [data]="cell.data" (valueEmitted)="handleValueEmitted($event)"></ng-template>
 </div>
