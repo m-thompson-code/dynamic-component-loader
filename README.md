@@ -1,6 +1,10 @@
 # dynamic-component-loader
 
-Showcases how to dynamicly generate components using a custom directive
+Showcases how to dynamicly generate components using a custom directive [demo](https://m-thompson-code.github.io/dynamic-component-loader/)
+
+[Angular walkthrough on dyamic components](https://angular.io/guide/dynamic-component-loader)
+
+[download to their walkthrough source code](https://angular.io/generated/zips/dynamic-component-loader/dynamic-component-loader.zip)
 
 ### Showcase
 
