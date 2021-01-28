@@ -1,0 +1,20 @@
+<div>
+    <button (click)="addCell('percent')">Percent</button>
+    <button (click)="addCell('currency')">Currency</button> 
+    <button (click)="addCell('input')">Input</button> 
+    <button (click)="popCell()">Pop</button>
+</div>
+
+<div>
+    <button (click)="randomizeDatas()">Randomize data</button>
+    <button (click)="randomizeComponents()">Randomize components</button>
+    <button (click)="shuffleCells()">Shuffle</button>
+</div>
+
+<div>
+    {{ text }}
+</div>
+
+<div>
+    <ng-template *ngFor="let cell of cells" appCell [component]="cell.component" [data]="cell.data" (dataEmitted)="handleCellDataEmitted($event)"></ng-template>
+</div>
