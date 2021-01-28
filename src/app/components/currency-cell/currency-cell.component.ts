@@ -9,7 +9,4 @@ import { BaseCellComponent } from 'src/app/cell.directive';
 })
 export class CurrencyCellComponent implements BaseCellComponent {
     @Input() data: number;
-
-    constructor() {
-    }
 }

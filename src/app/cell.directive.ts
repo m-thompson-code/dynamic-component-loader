@@ -71,6 +71,7 @@ export class CellDirective<T extends BaseCellComponent> implements OnInit, OnCha
     }
 
     setData() {
+        console.log("setData", this.component.name, this.data);
         if (!this.componentRef) {
             return;
         }
@@ -82,6 +83,6 @@ export class CellDirective<T extends BaseCellComponent> implements OnInit, OnCha
     }
 
     ngOnDestroy() {
-        this.sub.unsubscribe();
+        this.sub?.unsubscribe();
     }
 }
