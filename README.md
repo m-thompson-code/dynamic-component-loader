@@ -2,6 +2,9 @@
 
 Showcases how to dynamicly generate components using a custom directive
 
+[Angular walkthrough on dyamic components](https://angular.io/guide/dynamic-component-loader)
+[download to their walkthrough source code](https://angular.io/generated/zips/dynamic-component-loader/dynamic-component-loader.zip)
+
 ### Showcase
 
 This simple applicaton showcases dynamically adding / removing custom cells on the fly. You can also update the data for each cell or change the cell to a different component on the fly. There are 3 custom cell components.
