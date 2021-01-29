@@ -1,9 +1,9 @@
 <p>
     <ng-container *ngIf="!show">
-        <button (click)="show = true">Edit</button><span>{{ data }}</span>
+        <button (click)="show = true">Edit</button> <span>{{ data }}</span>
     </ng-container>
 
     <ng-container *ngIf="show">
-        <button (click)="save(input.value)">Save</button><input #input [value]="data" (input)="valueChanged.emit({type: 'input', value: input.value })">
+        <button (click)="save(input.value)">Save</button> <input #input [value]="data" (input)="valueChanged.emit({type: 'input', value: input.value })">
     </ng-container>
 </p>

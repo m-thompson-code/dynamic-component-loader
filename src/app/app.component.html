@@ -19,4 +19,9 @@
 </div>
 
 <!-- Rendering dynamic custom cell components -->
-<ng-template *ngFor="let cellComponent of cellComponents" appCell [cell]="cellComponent.cell" [data]="cellComponent.data" (valueChanged)="handleCellChangedEvent($event)"></ng-template>
+<ng-template *ngFor="let cellComponent of cellComponents" 
+    appCell 
+    [cell]="cellComponent.cell" 
+    [data]="cellComponent.data" 
+    (valueChanged)="handleCellChangedEvent($event)">
+</ng-template>
