@@ -1,5 +1,10 @@
 import { Component, Input, OnInit, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { BaseCellComponent, CellEvent } from 'src/app/cell.directive';
+import { BaseCellComponent, CellChangedEvent } from 'src/app/cell.directive';
+
+export interface InputCellChangedValue {
+    type: 'input' | 'saved';
+    input: string;
+}
 
 @Component({
     selector: 'app-input-cell',
@@ -7,16 +12,23 @@ import { BaseCellComponent, CellEvent } from 'src/app/cell.directive';
     styleUrls: ['./input-cell.component.css'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InputCellComponent implements BaseCellComponent {
-    @Input() data: string;
-    @Output() valueEmitted: EventEmitter<CellEvent<'input' | 'saved', string>> = new EventEmitter();
+export class InputCellComponent implements BaseCellComponent<string, InputCellChangedValue> {
+    @Input() data?: string;
+    @Output() valueChanged: EventEmitter<CellChangedEvent<InputCellChangedValue>> = new EventEmitter();
 
     show?: boolean;
 
-    save(value: string) {
-        this.data = value;
+    save(input: string): void {
+        this.data = input;
 
-        this.valueEmitted.emit({type: 'saved', value: this.data });
+        const changeValue: InputCellChangedValue = {
+            input: input,
+            type: 'saved',
+        }
+
+        this.valueChanged.emit({
+            value: changeValue,
+        });
 
         this.show = false;
     }

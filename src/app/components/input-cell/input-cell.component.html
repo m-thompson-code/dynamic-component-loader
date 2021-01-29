@@ -4,6 +4,6 @@
     </ng-container>
 
     <ng-container *ngIf="show">
-        <button (click)="save(input.value)">Save</button><input #input [value]="data" (input)="valueEmitted.emit({type: 'input', value: input.value })">
+        <button (click)="save(input.value)">Save</button><input #input [value]="data" (input)="valueChanged.emit({value: {type: 'input', input: input.value }})">
     </ng-container>
 </p>

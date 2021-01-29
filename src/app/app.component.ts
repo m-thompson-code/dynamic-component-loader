@@ -1,16 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { BaseCellComponent, CellEvent } from './cell.directive';
+import { Component, OnInit, Type } from '@angular/core';
+import { BaseCellComponent, CellChangedEvent } from './cell.directive';
 import { CurrencyCellComponent } from './components/currency-cell/currency-cell.component';
-import { InputCellComponent } from './components/input-cell/input-cell.component';
+import { InputCellChangedValue, InputCellComponent } from './components/input-cell/input-cell.component';
 import { PercentCellComponent } from './components/percent-cell/percent-cell.component';
 
-export interface Cell {
-    component: typeof BaseCellComponent;
+export interface CellComponent {
+    cell: Type<BaseCellComponent>;
     data: unknown;
-}
-
-interface Row {
-    cells: [];
 }
 
 @Component({
@@ -19,11 +15,11 @@ interface Row {
     templateUrl: './app.component.html',
 })
 export class AppComponent implements OnInit {
-    event?: CellEvent<'input' | 'saved', string>;
+    event?: CellChangedEvent<InputCellChangedValue>;
 
-    cells: Cell[] = [];
+    cellComponents: CellComponent[] = [];
 
-    cols: Cell[];
+    cols: CellComponent[] = [];
 
     constructor() {}
 
@@ -37,21 +33,21 @@ export class AppComponent implements OnInit {
 
     addCell(type: 'currency' | 'percent' | 'input'): void {
         if (type === 'currency') {
-            this.cells.push(this.getCurrencyCell());
+            this.cellComponents.push(this.getCurrencyCell());
         } else if (type === 'percent') {
-            this.cells.push(this.getPercentCell());
+            this.cellComponents.push(this.getPercentCell());
         } else {
-            this.cells.push(this.getInputCell());
+            this.cellComponents.push(this.getInputCell());
         }
     }
 
     popCell(): void {
-        this.cells.pop();
+        this.cellComponents.pop();
     }
 
     shuffleCells(): void {
         // source: https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
-        let currentIndex = this.cells.length, temporaryValue, randomIndex;
+        let currentIndex = this.cellComponents.length, temporaryValue, randomIndex;
 
         // While there remain elements to shuffle...
         while (0 !== currentIndex) {
@@ -61,60 +57,60 @@ export class AppComponent implements OnInit {
             currentIndex -= 1;
 
             // And swap it with the current element.
-            temporaryValue = this.cells[currentIndex];
-            this.cells[currentIndex] = this.cells[randomIndex];
-            this.cells[randomIndex] = temporaryValue;
+            temporaryValue = this.cellComponents[currentIndex];
+            this.cellComponents[currentIndex] = this.cellComponents[randomIndex];
+            this.cellComponents[randomIndex] = temporaryValue;
         }
     }
 
-    getCurrencyCell(): Cell {
+    getCurrencyCell(): CellComponent {
         return {
-            component: CurrencyCellComponent,
+            cell: CurrencyCellComponent,
             data: 100 * Math.random(),
         };
     }
 
-    getPercentCell(): Cell {
+    getPercentCell(): CellComponent {
         return {
-            component: PercentCellComponent,
+            cell: PercentCellComponent,
             data: 100 * Math.random() / 100,
         };
     }
 
-    getInputCell(): Cell {
+    getInputCell(): CellComponent {
         return {
-            component: InputCellComponent,
+            cell: InputCellComponent,
             data: 'some default ' + Math.floor(Math.random() * 100), 
         };
     }
 
     randomizeComponents(): void {
-        for (let i = 0; i < this.cells.length; i++) {
+        for (let i = 0; i < this.cellComponents.length; i++) {
             const seed = Math.floor(Math.random() * 3);
 
             if (seed === 2) {
-                this.cells[i] = this.getCurrencyCell();
+                this.cellComponents[i] = this.getCurrencyCell();
             } else if(seed === 1) {
-                this.cells[i] = this.getPercentCell();
+                this.cellComponents[i] = this.getPercentCell();
             } else {
-                this.cells[i] = this.getInputCell();
+                this.cellComponents[i] = this.getInputCell();
             }
         }
     }
     
     randomizeDatas(): void {
-        for (const cell of this.cells) {
-            if (cell.component === CurrencyCellComponent) {
-                cell.data = 100 * Math.random();
-            } else if (cell.component === PercentCellComponent) {
-                cell.data = 100 * Math.random() / 100;
+        for (const cellComponent of this.cellComponents) {
+            if (cellComponent.cell === CurrencyCellComponent) {
+                cellComponent.data = 100 * Math.random();
+            } else if (cellComponent.cell === PercentCellComponent) {
+                cellComponent.data = 100 * Math.random() / 100;
             } else {
-                cell.data = 'some default ' + Math.floor(Math.random() * 100);
+                cellComponent.data = 'some default ' + Math.floor(Math.random() * 100);
             }
         }
     }
 
-    handleValueEmitted(event: CellEvent<'input' | 'saved', string>) {
+    handleCellChangedEvent(event: CellChangedEvent<InputCellChangedValue>): void {
         console.log(event);
         this.event = event;
     }

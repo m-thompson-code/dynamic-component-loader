@@ -14,11 +14,9 @@
 </div>
 
 <!-- Showcasing output binding from input cell component -->
-<div *ngIf="event">
-    {{ event.type }} : {{ event.value }}
+<div *ngIf="event?.value as value">
+    {{ value.type }} : {{ value.input }}
 </div>
 
-<!-- Rendering dynamic custom cells -->
-<div>
-    <ng-template *ngFor="let cell of cells" appCell [component]="cell.component" [data]="cell.data" (valueEmitted)="handleValueEmitted($event)"></ng-template>
-</div>
+<!-- Rendering dynamic custom cell components -->
+<ng-template *ngFor="let cellComponent of cellComponents" appCell [cell]="cellComponent.cell" [data]="cellComponent.data" (valueChanged)="handleCellChangedEvent($event)"></ng-template>

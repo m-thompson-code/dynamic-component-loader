@@ -1,86 +1,110 @@
-import { ChangeDetectorRef, Component, ComponentFactoryResolver, 
-    ComponentRef, Directive, EventEmitter, Input, OnChanges, OnDestroy, 
-    OnInit, Output, SimpleChanges, ViewContainerRef } from '@angular/core';
+import {
+    ChangeDetectorRef,
+    Component,
+    ComponentFactoryResolver,
+    ComponentRef,
+    Directive,
+    EventEmitter,
+    Input,
+    OnChanges,
+    OnDestroy,
+    OnInit,
+    Output,
+    SimpleChanges,
+    ViewContainerRef,
+} from '@angular/core';
 import { Type } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 // Universal output event for cells
-export interface CellEvent<T=string, V=unknown> {
-    type: T;
-    value: V;
+export interface CellChangedEvent<T = any> {
+    value: T;
 }
 
 // Each custom cell component should implement this base class
 @Component({
-    selector: 'app-base-cell',
+    // selector: 'app-base-cell',
     template: '',
 })
-export class BaseCellComponent {
-    // Should be used for any and all input bindings for custom cell component
-    @Input() data?: unknown;
-    // Should be used for any and all output bindings for custom cell component
-    @Output() valueEmitted?: EventEmitter<CellEvent>;
+export class BaseCellComponent<S=any, T=any> {
+    /** Should be used for any and all input bindings for custom cell component */
+    @Input() data?: S;
+    /** Should be used for any and all output bindings for custom cell component */
+    @Output() valueChanged?: EventEmitter<CellChangedEvent<T>>;
 }
 
 /**
- * Injects a dynamic cell component
- * 
- * <ng-template appCell 
- *      component="CellComponent" 
- *      [data]="inputBinding" 
- *      (valueEmitted)="handleValueEmitted($event)">
+ * Directive used to render a dynamic cell component
+ *
+ * <ng-template appCell
+ *      cell="CustomCellComponent"
+ *      [data]="inputBinding"
+ *      (valueChanged)="handleCellChangedEvent($event)">
  * </ng-template>
  */
 @Directive({
     selector: '[appCell]',
 })
-export class CellDirective<T extends BaseCellComponent> implements OnInit, OnChanges, OnDestroy {
-    // Component Class Type
-    @Input() component!: Type<T>;
-    // Input binding for the instance of Component
+export class CellDirective<C extends BaseCellComponent>
+    implements OnInit, OnChanges, OnDestroy {
+    /** Custom cell component class */
+    @Input() cell!: Type<C>;
+    /**  Input binding for the instance of custom cell component */
     @Input() data: unknown;
-    // Output binding for the instance of Component
-    @Output() valueEmitted: EventEmitter<CellEvent> = new EventEmitter();
+    /**  Output binding for the instance of custom cell component */
+    @Output() valueChanged: EventEmitter<CellChangedEvent> = new EventEmitter();
 
-    // Stored componentRef once instance in created
-    // Used to mark component for check when data is changed
-    componentRef?: ComponentRef<T>;
+    /**
+     * Stored componentRef once instance in created
+     * Used to mark component for check when data is changed
+     */
+    componentRef?: ComponentRef<C>;
 
-    // TODO: find a more reactive way to handle passing the output events
+    /**
+     * @deprecated TODO: find a more reactive way to handle passing the output events, this should be removed
+     */
     sub?: Subscription | null;
 
-    constructor(public viewContainerRef: ViewContainerRef, private componentFactoryResolver: ComponentFactoryResolver) { }
+    constructor(
+        private viewContainerRef: ViewContainerRef,
+        private componentFactoryResolver: ComponentFactoryResolver
+    ) {}
 
-    ngOnInit() {
+    ngOnInit(): void {
         this.loadComponent();
     }
 
     // Handle change detection
     ngOnChanges(changes: SimpleChanges): void {
-        const componentChange = changes['component'];
-        if (componentChange && !componentChange.isFirstChange()) {
+        const { cell: cellChanges, data: dataChanges } = changes;
+
+        if (cellChanges && !cellChanges.isFirstChange()) {
             this.loadComponent();
             return;
         }
 
-        const dataChange = changes['data'];
-        if (dataChange && !dataChange.isFirstChange()) {
+        if (dataChanges && !dataChanges.isFirstChange()) {
             this.setData();
         }
     }
 
-    loadComponent() {
+    /**
+     * Inject dynamic cell component using ViewContainerRef and setup input and output bindings
+     */
+    loadComponent(): void {
         // Debugging log
-        console.log("~ loadComponent", this.component.name, this.data);
+        console.log('~ loadComponent', this.cell.name, this.data);
 
-        // Create factory for component
-        const componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.component);
+        // Create factory for cell component
+        const componentFactory = this.componentFactoryResolver.resolveComponentFactory<C>(
+            this.cell
+        );
 
         // Clear any existing views already in template
         this.viewContainerRef.clear();
 
         // Create component instance using factory
-        this.componentRef = this.viewContainerRef.createComponent(componentFactory);
+        this.componentRef = this.viewContainerRef.createComponent<C>(componentFactory);
 
         // Bind input data
         this.setData();
@@ -89,21 +113,24 @@ export class CellDirective<T extends BaseCellComponent> implements OnInit, OnCha
         this.sub?.unsubscribe();
 
         // If component instance has output binding, subscribe to it and emit its output value
-        if (this.componentRef.instance.valueEmitted) {
-            this.sub = this.componentRef.instance.valueEmitted.subscribe(value => {
-                this.valueEmitted.emit(value);
+        if (this.componentRef.instance.valueChanged) {
+            this.sub = this.componentRef.instance.valueChanged.subscribe((value: CellChangedEvent) => {
+                this.valueChanged.emit(value);
             });
         } else {
             this.sub = null;
         }
     }
 
-    setData() {
+    /**
+     * Set input bindings and mark custom cell component instance for check
+     */
+    setData(): void {
         // Debugging log
-        console.log("~ \tsetData", this.component.name, this.data);
+        console.log('~ \tsetData', this.cell.name, this.data);
 
         if (!this.componentRef) {
-            return;
+            throw new Error("Unexpected missing componentRef");
         }
 
         // Set input binding
@@ -114,7 +141,7 @@ export class CellDirective<T extends BaseCellComponent> implements OnInit, OnCha
     }
 
     // Clean up subscriptions
-    ngOnDestroy() {
+    ngOnDestroy(): void {
         this.sub?.unsubscribe();
     }
 }

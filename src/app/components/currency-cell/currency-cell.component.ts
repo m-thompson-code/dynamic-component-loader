@@ -8,5 +8,5 @@ import { BaseCellComponent } from 'src/app/cell.directive';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CurrencyCellComponent implements BaseCellComponent {
-    @Input() data: number;
+    @Input() data?: number;
 }
