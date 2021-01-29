@@ -3,7 +3,7 @@ import { BaseCellComponent, CellChangedEvent } from 'src/app/cell.directive';
 
 export interface InputCellChangedValue {
     type: 'input' | 'saved';
-    input: string;
+    value: string;
 }
 
 @Component({
@@ -21,13 +21,9 @@ export class InputCellComponent implements BaseCellComponent<string, InputCellCh
     save(input: string): void {
         this.data = input;
 
-        const changeValue: InputCellChangedValue = {
-            input: input,
-            type: 'saved',
-        }
-
         this.valueChanged.emit({
-            value: changeValue,
+            value: input,
+            type: 'saved',
         });
 
         this.show = false;

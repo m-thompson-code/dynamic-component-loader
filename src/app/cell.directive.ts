@@ -17,9 +17,7 @@ import { Type } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 // Universal output event for cells
-export interface CellChangedEvent<T = any> {
-    value: T;
-}
+export type CellChangedEvent<T = any> = T;
 
 // Each custom cell component should implement this base class
 @Component({

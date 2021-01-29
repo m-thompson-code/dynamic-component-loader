@@ -14,8 +14,8 @@
 </div>
 
 <!-- Showcasing output binding from input cell component -->
-<div *ngIf="event?.value as value">
-    {{ value.type }} : {{ value.input }}
+<div *ngIf="event">
+    {{ event.type }} : {{ event.value }}
 </div>
 
 <!-- Rendering dynamic custom cell components -->
