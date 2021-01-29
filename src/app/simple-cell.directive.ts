@@ -16,51 +16,33 @@ import {
 import { Type } from '@angular/core';
 import { Subscription } from 'rxjs';
 
-// Universal output event for cells
-export type CellChangedEvent<T = any> = T;
-
-// Each custom cell component should implement this base class
-@Component({
-    // selector: 'app-base-cell',
-    template: '',
-})
-export class BaseCellComponent<S=any, T=any> {
-    /** Should be used for any and all input bindings for custom cell component */
-    @Input() data?: S;
-    /** Should be used for any and all output bindings for custom cell component */
-    @Output() valueChanged?: EventEmitter<CellChangedEvent<T>>;
-}
-
 /**
  * Directive used to render a dynamic cell component
  *
- * <ng-template appCell
+ * <ng-template appSimpleCell
  *      cell="CustomCellComponent"
  *      [data]="inputBinding"
  *      (valueChanged)="handleCellChangedEvent($event)">
  * </ng-template>
  */
 @Directive({
-    selector: '[appCell]',
+    selector: '[appSimpleCell]',
 })
-export class CellDirective<C extends BaseCellComponent>
+export class SimpleCellDirective
     implements OnInit, OnChanges, OnDestroy {
     /** Custom cell component class */
-    @Input() cell!: Type<C>;
+    @Input() cell!: Type<unknown>;
     /**  Input binding for the instance of custom cell component */
     @Input() data: unknown;
     /**  Output binding for the instance of custom cell component */
-    @Output() valueChanged: EventEmitter<CellChangedEvent> = new EventEmitter();
+    @Output() valueChanged: EventEmitter<any> = new EventEmitter();
 
     /**
      * Stored componentRef once instance in created
      * Used to mark component for check when data is changed
      */
-    componentRef?: ComponentRef<C>;
+    componentRef?: ComponentRef<any>;
 
-    /**
-     * @remove TODO: find a more reactive way to handle passing the output events, this should be removed
-     */
     sub?: Subscription | null;
 
     constructor(
@@ -90,11 +72,8 @@ export class CellDirective<C extends BaseCellComponent>
      * Inject dynamic cell component using ViewContainerRef and setup input and output bindings
      */
     loadComponent(): void {
-        // Debugging log
-        console.log('~ loadComponent', this.cell.name, this.data);
-
         // Create factory for cell component
-        const componentFactory = this.componentFactoryResolver.resolveComponentFactory<C>(
+        const componentFactory = this.componentFactoryResolver.resolveComponentFactory(
             this.cell
         );
 
@@ -102,7 +81,7 @@ export class CellDirective<C extends BaseCellComponent>
         this.viewContainerRef.clear();
 
         // Create component instance using factory
-        this.componentRef = this.viewContainerRef.createComponent<C>(componentFactory);
+        this.componentRef = this.viewContainerRef.createComponent(componentFactory);
 
         // Bind input data
         this.setData();
@@ -112,7 +91,7 @@ export class CellDirective<C extends BaseCellComponent>
 
         // If component instance has output binding, subscribe to it and emit its output value
         if (this.componentRef.instance.valueChanged) {
-            this.sub = this.componentRef.instance.valueChanged.subscribe((value: CellChangedEvent) => {
+            this.sub = this.componentRef.instance.valueChanged.subscribe((value: any) => {
                 this.valueChanged.emit(value);
             });
         } else {
@@ -124,9 +103,6 @@ export class CellDirective<C extends BaseCellComponent>
      * Set input bindings and mark custom cell component instance for check
      */
     setData(): void {
-        // Debugging log
-        console.log('~ \tsetData', this.cell.name, this.data);
-
         if (!this.componentRef) {
             throw new Error("Unexpected missing componentRef");
         }
