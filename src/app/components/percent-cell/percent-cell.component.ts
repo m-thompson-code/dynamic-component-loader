@@ -5,7 +5,7 @@ import { BaseCellComponent } from 'src/app/cell.directive';
 @Component({
     selector: 'app-percent-cell',
     templateUrl: './percent-cell.component.html',
-    styleUrls: ['./percent-cell.component.css'],
+    styleUrls: ['./percent-cell.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PercentCellComponent extends BaseCellComponent<number> {

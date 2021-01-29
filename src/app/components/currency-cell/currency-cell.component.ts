@@ -4,7 +4,7 @@ import { BaseCellComponent } from 'src/app/cell.directive';
 @Component({
     selector: 'app-currency-cell',
     templateUrl: './currency-cell.component.html',
-    styleUrls: ['./currency-cell.component.css'],
+    styleUrls: ['./currency-cell.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CurrencyCellComponent implements BaseCellComponent {

@@ -14,7 +14,7 @@
 </div>
 
 <!-- Showcasing output binding from input cell component -->
-<div *ngIf="event">
+<div *ngIf="event" [style.border-bottom]="'1px solid grey'">
     {{ event.type }} : {{ event.value }}
 </div>
 

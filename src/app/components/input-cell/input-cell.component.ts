@@ -9,7 +9,7 @@ export interface InputCellChangedValue {
 @Component({
     selector: 'app-input-cell',
     templateUrl: './input-cell.component.html',
-    styleUrls: ['./input-cell.component.css'],
+    styleUrls: ['./input-cell.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputCellComponent implements BaseCellComponent<string, InputCellChangedValue> {
