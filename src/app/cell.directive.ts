@@ -58,9 +58,7 @@ export class CellDirective<C extends BaseCellComponent>
      */
     componentRef?: ComponentRef<C>;
 
-    /**
-     * @remove TODO: find a more reactive way to handle passing the output events, this should be removed
-     */
+    // Used to raise events emitted from instance of custom cell component
     sub?: Subscription | null;
 
     constructor(
@@ -91,7 +89,7 @@ export class CellDirective<C extends BaseCellComponent>
      */
     loadComponent(): void {
         // Debugging log
-        console.log('~ loadComponent', this.cell.name, this.data);
+        // console.log('~ loadComponent', this.cell.name, this.data);
 
         // Create factory for cell component
         const componentFactory = this.componentFactoryResolver.resolveComponentFactory<C>(
@@ -104,20 +102,11 @@ export class CellDirective<C extends BaseCellComponent>
         // Create component instance using factory
         this.componentRef = this.viewContainerRef.createComponent<C>(componentFactory);
 
-        // Bind input data
+        // Handle Input bindings
         this.setData();
 
-        // Clean up output subscription
-        this.sub?.unsubscribe();
-
-        // If component instance has output binding, subscribe to it and emit its output value
-        if (this.componentRef.instance.valueChanged) {
-            this.sub = this.componentRef.instance.valueChanged.subscribe((value: CellChangedEvent) => {
-                this.valueChanged.emit(value);
-            });
-        } else {
-            this.sub = null;
-        }
+        // Handle Output bindings
+        this.setValueChanged();
     }
 
     /**
@@ -125,7 +114,7 @@ export class CellDirective<C extends BaseCellComponent>
      */
     setData(): void {
         // Debugging log
-        console.log('~ \tsetData', this.cell.name, this.data);
+        // console.log('~ \tsetData', this.cell.name, this.data);
 
         if (!this.componentRef) {
             throw new Error("Unexpected missing componentRef");
@@ -138,8 +127,27 @@ export class CellDirective<C extends BaseCellComponent>
         this.componentRef.injector.get(ChangeDetectorRef).markForCheck();
     }
 
+    setValueChanged(): void {
+        // Clean up output subscription
+        this.sub?.unsubscribe();
+
+        if (!this.componentRef) {
+            throw new Error("Unexpected missing componentRef");
+        }
+
+        // If component instance has output binding, subscribe to it and emit its output value
+        if (this.componentRef.instance.valueChanged) {
+            this.sub = this.componentRef.instance.valueChanged.subscribe((value: CellChangedEvent) => {
+                this.valueChanged.emit(value);
+            });
+        } else {
+            this.sub = null;
+        }
+    }
+
     // Clean up subscriptions
     ngOnDestroy(): void {
+        this.componentRef?.destroy();
         this.sub?.unsubscribe();
     }
 }

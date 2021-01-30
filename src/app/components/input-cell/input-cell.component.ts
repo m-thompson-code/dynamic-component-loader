@@ -2,7 +2,7 @@ import { Component, Input, OnInit, Output, EventEmitter, ChangeDetectionStrategy
 import { BaseCellComponent, CellChangedEvent } from 'src/app/cell.directive';
 
 export interface InputCellChangedValue {
-    type: 'input' | 'saved';
+    type: 'input' | 'saved' | 'opened';
     value: string;
 }
 
@@ -17,6 +17,17 @@ export class InputCellComponent implements BaseCellComponent<string, InputCellCh
     @Output() valueChanged: EventEmitter<CellChangedEvent<InputCellChangedValue>> = new EventEmitter();
 
     show?: boolean;
+
+    toggleShow(): void {
+        if (!this.show) {
+            this.valueChanged.emit({
+                value: '',
+                type: 'opened',
+            });
+        }
+
+        this.show = !this.show;
+    }
 
     save(input: string): void {
         this.data = input;

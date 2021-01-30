@@ -41,6 +41,12 @@ export class AppComponent implements OnInit {
         }
     }
 
+    addRandomCells(count: number): void {
+        for (let i = 0; i < count; i++) {
+            this.cellComponents.push(this.getRandomCell());
+        }
+    }
+
     popCell(): void {
         this.cellComponents.pop();
     }
@@ -84,17 +90,21 @@ export class AppComponent implements OnInit {
         };
     }
 
+    getRandomCell(): CellComponent {
+        const seed = Math.floor(Math.random() * 3);
+
+        if (seed === 2) {
+            return this.getCurrencyCell();
+        } else if(seed === 1) {
+            return this.getPercentCell();
+        }
+
+        return this.getInputCell();
+    }
+
     randomizeComponents(): void {
         for (let i = 0; i < this.cellComponents.length; i++) {
-            const seed = Math.floor(Math.random() * 3);
-
-            if (seed === 2) {
-                this.cellComponents[i] = this.getCurrencyCell();
-            } else if(seed === 1) {
-                this.cellComponents[i] = this.getPercentCell();
-            } else {
-                this.cellComponents[i] = this.getInputCell();
-            }
+            this.cellComponents[i] = this.getRandomCell();
         }
     }
     
