@@ -12,9 +12,10 @@ import {
     Output,
     SimpleChanges,
     ViewContainerRef,
+    Type
 } from '@angular/core';
-import { Type } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 // Universal output event for cells
 export type CellChangedEvent<T = any> = T;
@@ -34,14 +35,14 @@ export class BaseCellComponent<S=any, T=any> {
 /**
  * Directive used to render a dynamic cell component
  *
- * <ng-template appCell
- *      cell="CustomCellComponent"
+ * <ng-template
+ *      [cell]="CustomCellComponent"
  *      [data]="inputBinding"
  *      (valueChanged)="handleCellChangedEvent($event)">
  * </ng-template>
  */
 @Directive({
-    selector: '[appCell]',
+    selector: '[cell]',
 })
 export class CellDirective<C extends BaseCellComponent>
     implements OnInit, OnChanges, OnDestroy {
@@ -58,10 +59,8 @@ export class CellDirective<C extends BaseCellComponent>
      */
     componentRef?: ComponentRef<C>;
 
-    /**
-     * @remove TODO: find a more reactive way to handle passing the output events, this should be removed
-     */
-    sub?: Subscription | null;
+    // Used clean up valueChanged subscriptions
+    private readonly unsubscribe$ = new Subject<void>();
 
     constructor(
         private viewContainerRef: ViewContainerRef,
@@ -72,7 +71,31 @@ export class CellDirective<C extends BaseCellComponent>
         this.loadComponent();
     }
 
-    // Handle change detection
+    /**
+     * Inject dynamic cell component using ViewContainerRef and setup input and output bindings
+     */
+    loadComponent(): void {
+        // Create factory for cell component
+        const componentFactory = this.componentFactoryResolver.resolveComponentFactory<C>(
+            this.cell
+        );
+
+        // Clear any existing views already in template
+        this.viewContainerRef.clear();
+
+        // Create component instance using factory
+        this.componentRef = this.viewContainerRef.createComponent<C>(componentFactory);
+
+        // Handle Input bindings
+        this.setData();
+
+        // Handle Output bindings
+        this.setValueChanged();
+    }
+
+    /**
+     * Handle change detection
+     */
     ngOnChanges(changes: SimpleChanges): void {
         const { cell: cellChanges, data: dataChanges } = changes;
 
@@ -87,45 +110,11 @@ export class CellDirective<C extends BaseCellComponent>
     }
 
     /**
-     * Inject dynamic cell component using ViewContainerRef and setup input and output bindings
-     */
-    loadComponent(): void {
-        // Debugging log
-        console.log('~ loadComponent', this.cell.name, this.data);
-
-        // Create factory for cell component
-        const componentFactory = this.componentFactoryResolver.resolveComponentFactory<C>(
-            this.cell
-        );
-
-        // Clear any existing views already in template
-        this.viewContainerRef.clear();
-
-        // Create component instance using factory
-        this.componentRef = this.viewContainerRef.createComponent<C>(componentFactory);
-
-        // Bind input data
-        this.setData();
-
-        // Clean up output subscription
-        this.sub?.unsubscribe();
-
-        // If component instance has output binding, subscribe to it and emit its output value
-        if (this.componentRef.instance.valueChanged) {
-            this.sub = this.componentRef.instance.valueChanged.subscribe((value: CellChangedEvent) => {
-                this.valueChanged.emit(value);
-            });
-        } else {
-            this.sub = null;
-        }
-    }
-
-    /**
      * Set input bindings and mark custom cell component instance for check
      */
     setData(): void {
         // Debugging log
-        console.log('~ \tsetData', this.cell.name, this.data);
+        // console.log('~ \tsetData', this.cell.name, this.data);
 
         if (!this.componentRef) {
             throw new Error("Unexpected missing componentRef");
@@ -138,8 +127,29 @@ export class CellDirective<C extends BaseCellComponent>
         this.componentRef.injector.get(ChangeDetectorRef).markForCheck();
     }
 
-    // Clean up subscriptions
+    /**
+     * Update valueChanged emitter. Cleans up previous subscription if it exists
+     */
+    setValueChanged(): void {
+        // Clean up output subscription
+        this.unsubscribe$.next();
+
+        if (!this.componentRef) {
+            throw new Error("Unexpected missing componentRef");
+        }
+
+        // If component instance has output binding, subscribe to it and emit its output value
+        this.componentRef.instance.valueChanged?.pipe(takeUntil(this.unsubscribe$)).subscribe((value: CellChangedEvent) => {
+            this.valueChanged.emit(value);
+        });
+    }
+
+    /**
+     * Clean up subscriptions and dynamic component instance
+     */
     ngOnDestroy(): void {
-        this.sub?.unsubscribe();
+        this.componentRef?.destroy();
+        this.unsubscribe$.next();
+        this.unsubscribe$.complete();
     }
 }

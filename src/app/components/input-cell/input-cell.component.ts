@@ -1,8 +1,14 @@
-import { Component, Input, OnInit, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { BaseCellComponent, CellChangedEvent } from 'src/app/cell.directive';
 
+export enum InputCellEventType {
+    INPUT = "INPUT", 
+    SAVED = "SAVED",
+    EDIT = "EDIT"
+}
+
 export interface InputCellChangedValue {
-    type: 'input' | 'saved';
+    type: InputCellEventType;
     value: string;
 }
 
@@ -18,12 +24,25 @@ export class InputCellComponent implements BaseCellComponent<string, InputCellCh
 
     show?: boolean;
 
+    readonly InputCellEventType = InputCellEventType;
+
+    toggleShow(): void {
+        if (!this.show) {
+            this.valueChanged.emit({
+                value: '',
+                type: InputCellEventType.EDIT,
+            });
+        }
+
+        this.show = !this.show;
+    }
+
     save(input: string): void {
         this.data = input;
 
         this.valueChanged.emit({
             value: input,
-            type: 'saved',
+            type: InputCellEventType.SAVED,
         });
 
         this.show = false;

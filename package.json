@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve -o",
     "build": "ng build --prod",
     "serve": "ng serve --prod",
     "deploy": "ng build --prod --base-href https://m-thompson-code.github.io/dynamic-component-loader/ && npx ngh -no-silent",
@@ -31,6 +31,7 @@
     "@angular/compiler-cli": "~11.1.0",
     "@types/jasmine": "~3.6.0",
     "@types/node": "^12.11.1",
+    "angular-cli-ghpages": "^1.0.0-rc.1",
     "codelyzer": "^6.0.0",
     "jasmine-core": "~3.6.0",
     "jasmine-spec-reporter": "~5.0.0",
