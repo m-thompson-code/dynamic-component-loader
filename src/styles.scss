@@ -1,8 +1,6 @@
-$padding: 22px;
+@use "sass:math";
 
-body {
-  
-}
+$padding: 22px;
 
 body {
   margin: 2em;
@@ -16,15 +14,15 @@ a {
   cursor: pointer;
 }
 input {
-  padding: #{$padding/2} $padding;
+  padding: math.div($padding, 2) $padding;
   font-size: 16px;
 }
 button {
   font-size: 16px;
   background-color: #eee;
   border: none;
-  padding: #{$padding/2} $padding;
-  border-radius: $padding/2;
+  padding: math.div($padding, 2) $padding;
+  border-radius: math.div($padding, 2);
   cursor: pointer;
 }
 button:hover {
@@ -38,13 +36,13 @@ button:disabled {
 
 /* Navigation link styles */
 nav a {
-  padding: #{$padding/2} $padding;
+  padding: math.div($padding, 2) $padding;
   text-decoration: none;
   margin-right: $padding;
   margin-top: $padding;
   display: inline-block;
   background-color: #eee;
-  border-radius: $padding/2;
+  border-radius: math.div($padding, 2);
 }
 nav a:visited, a:link {
   color: #607D8B;
