@@ -6,7 +6,7 @@
     "start": "ng serve -o",
     "build": "ng build --prod",
     "serve": "ng serve --prod",
-    "deploy": "ng build --prod --base-href https://m-thompson-code.github.io/dynamic-component-loader/ && npx ngh -no-silent",
+    "deploy": "ng deploy --base-href https://m-thompson-code.github.io/dynamic-component-loader/ --no-silent",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
