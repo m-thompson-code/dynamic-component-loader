@@ -1,7 +1,6 @@
 import {
     ChangeDetectorRef,
     Component,
-    ComponentFactoryResolver,
     ComponentRef,
     Directive,
     EventEmitter,
@@ -12,7 +11,8 @@ import {
     Output,
     SimpleChanges,
     ViewContainerRef,
-    Type
+    Type,
+    ComponentFactoryResolver
 } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -44,8 +44,8 @@ export class BaseCellComponent<S=any, T=any> {
 @Directive({
     selector: '[cell]',
 })
-export class CellDirective<C extends BaseCellComponent>
-    implements OnInit, OnChanges, OnDestroy {
+export class CellDirective<C extends BaseCellComponent> implements OnInit, OnChanges, OnDestroy {
+    // #region bindings
     /** Custom cell component class */
     @Input() cell!: Type<C>;
     /**  Input binding for the instance of custom cell component */
@@ -53,14 +53,17 @@ export class CellDirective<C extends BaseCellComponent>
     /**  Output binding for the instance of custom cell component */
     @Output() valueChanged: EventEmitter<CellChangedEvent> = new EventEmitter();
 
+    /** Used clean up valueChanged subscriptions */
+    private readonly unsubscribe$ = new Subject<void>();
+    // #endregion
+
+    // #region properties
     /**
-     * Stored componentRef once instance in created
-     * Used to mark component for check when data is changed
+     * Stored ComponentRef once instance in created
+     * Used to mark Component for check when data has changed
      */
     componentRef?: ComponentRef<C>;
-
-    // Used clean up valueChanged subscriptions
-    private readonly unsubscribe$ = new Subject<void>();
+    // #endregion
 
     constructor(
         private viewContainerRef: ViewContainerRef,
@@ -75,15 +78,12 @@ export class CellDirective<C extends BaseCellComponent>
      * Inject dynamic cell component using ViewContainerRef and setup input and output bindings
      */
     loadComponent(): void {
-        // Create factory for cell component
-        const componentFactory = this.componentFactoryResolver.resolveComponentFactory<C>(
-            this.cell
-        );
-
         // Clear any existing views already in template
         this.viewContainerRef.clear();
 
-        // Create component instance using factory
+        const componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.cell);
+
+        // Create component instance
         this.componentRef = this.viewContainerRef.createComponent<C>(componentFactory);
 
         // Handle Input bindings

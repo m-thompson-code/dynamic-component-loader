@@ -1,7 +1,12 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "cli": {
-    "analytics": "ce1f2360-6afc-4ec0-b57d-515a0b1a53cb"
+    "analytics": "ce1f2360-6afc-4ec0-b57d-515a0b1a53cb",
+    "cache": {
+        "enabled": true,
+        "path": ".cache",
+        "environment": "all"
+    }
   },
   "version": 1,
   "newProjectRoot": "projects",
@@ -106,19 +111,6 @@
               "src/styles.scss"
             ],
             "scripts": []
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "tsconfig.app.json",
-              "tsconfig.spec.json",
-              "e2e/tsconfig.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
           }
         },
         "e2e": {
